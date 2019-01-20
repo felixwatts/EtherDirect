@@ -1,0 +1,46 @@
+{
+    "type": "transaction.created",
+    "data":     {
+        "id": "tx_00009exl5Ni96JK2NMC9c9",
+        "created": "2019-01-19T17:12:07.229Z",
+        "description": "0xDaEF995931D6F00F56226b29ba70353327b21E01",
+        "amount": 500,
+        "fees": {},
+        "currency": "GBP",
+        "merchant": null,
+        "notes": "TEST1",
+        "metadata": {
+          "faster_payment": "true",
+          "fps_payment_id": "",
+          "insertion": "",
+          "notes": "TEST1",
+          "trn": ""
+        },
+        "labels": null,
+        "account_balance": 0,
+        "attachments": [],
+        "international": null,
+        "category": "general",
+        "is_load": false,
+        "settled": "2019-01-21T07:00:00Z",
+        "local_amount": 100,
+        "local_currency": "GBP",
+        "updated": "2019-01-19T17:12:07.352Z",
+        "account_id": "",
+        "user_id": "",
+        "counterparty": {
+          "account_number": "00000000",
+          "name": "Name",
+          "sort_code": "000000",
+          "user_id": ""
+        },
+        "scheme": "payport_faster_payments",
+        "dedupe_id": "",
+        "originator": false,
+        "include_in_spending": false,
+        "can_be_excluded_from_breakdown": false,
+        "can_be_made_subscription": false,
+        "can_split_the_bill": false,
+        "can_add_to_tab": false
+    }
+}
