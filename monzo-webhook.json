@@ -3,17 +3,17 @@
     "data":     {
         "id": "tx_00009exl5Ni96JK2NMC9c9",
         "created": "2019-01-19T17:12:07.229Z",
-        "description": "0xDaEF995931D6F00F56226b29ba70353327b21E01",
-        "amount": 500,
+        "description": "0xDaEF995931D6F00F56226b29ba70353327b21E00",
+        "amount": 100,
         "fees": {},
         "currency": "GBP",
         "merchant": null,
-        "notes": "TEST1",
+        "notes": "",
         "metadata": {
           "faster_payment": "true",
           "fps_payment_id": "",
           "insertion": "",
-          "notes": "TEST1",
+          "notes": "",
           "trn": ""
         },
         "labels": null,
