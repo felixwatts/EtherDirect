@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -12,10 +13,13 @@ import (
 )
 
 var templates = make(map[string]*template.Template)
-var coinbaseClient = coinbase.NewClient(CoinbaseSecret, CoinbaseKey, CoinbasePassphrase)
+var coinbaseClient = coinbase.NewClient(
+	os.Getenv("CoinbaseSecret"),
+	os.Getenv("CoinbaseKey"),
+	os.Getenv("CoinbasePassphrase"))
 var monzoClient = monzo.Client{
 	BaseURL:     "https://api.monzo.com",
-	AccessToken: MonzoAccessToken,
+	AccessToken: os.Getenv("MonzoAccessToken"),
 }
 var nextDedupeId int64 = 0
 
@@ -77,7 +81,7 @@ func main() {
 
 	httpsMux.HandleFunc("/favicon.ico", faviconHandler)
 	httpsMux.HandleFunc("/", indexHandler)
-	httpsMux.HandleFunc("/monzo-"+WebHookSecretUrlPart, monzoWebhookHandler)
+	httpsMux.HandleFunc("/monzo-"+os.Getenv("WebHookSecretUrlPart"), monzoWebhookHandler)
 	httpsMux.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir(FileSystemRoot+"js"))))
 	httpsMux.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir(FileSystemRoot+"css"))))
 

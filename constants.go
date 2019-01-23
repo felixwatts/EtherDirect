@@ -1,9 +1,9 @@
 package main
 
 const (
-	PortHttp           = 8081
-	PortHttps          = 8443
-	HttpsRedirectRoot  = "https://localhost:8443"
+	PortHttp           = 80                          //8081
+	PortHttps          = 443                         //8443
+	HttpsRedirectRoot  = "https://etherdirect.co.uk" // "https://localhost:8443"
 	HttpsCertificate   = "/etc/letsencrypt/live/etherdirect.co.uk/fullchain.pem"
 	HttpsPrivateKey    = "/etc/letsencrypt/live/etherdirect.co.uk/privkey.pem"
 	FileSystemRoot     = "./"

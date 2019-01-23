@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 
@@ -16,7 +17,7 @@ import (
 
 func PostMonzoFeedError(err error) error {
 	return monzoClient.CreateFeedItem(&monzo.FeedItem{
-		AccountID: MonzoAccountId,
+		AccountID: os.Getenv("MonzoAccountId"),
 		Title:     "ERROR",
 		Body:      err.Error(),
 		Type:      "basic",
@@ -26,7 +27,7 @@ func PostMonzoFeedError(err error) error {
 
 func PostMonzoFeedInfo(heading string, msg string) error {
 	return monzoClient.CreateFeedItem(&monzo.FeedItem{
-		AccountID: MonzoAccountId,
+		AccountID: os.Getenv("MonzoAccountId"),
 		Title:     heading,
 		Body:      msg,
 		Type:      "basic",
@@ -55,7 +56,7 @@ func DepositToMonzoPot(potId string, amountPence uint) error {
 
 	_, err := monzoClient.Deposit(&monzo.DepositRequest{
 		PotID:          potId,
-		AccountID:      MonzoAccountId,
+		AccountID:      os.Getenv("MonzoAccountId"),
 		Amount:         int64(amountPence),
 		IdempotencyKey: strconv.FormatInt(ddid, 10),
 	})
@@ -119,7 +120,7 @@ func Refund(tx Order, err error) error {
 
 	PostMonzoFeedInfo("REFUND", fmt.Sprintf("%s %s %d %s %s", tx.SortCode, tx.AccountNumber, tx.Amount, tx.Currency, err.Error()))
 
-	err2 := DepositToMonzoPot(MonzoPotIdRefund, tx.Amount)
+	err2 := DepositToMonzoPot(os.Getenv("MonzoPotIdRefund"), tx.Amount)
 
 	if err2 != nil {
 		return errors.New("Failed to deposit into Refund pot: " + err2.Error() + ". Original error: " + err.Error())
@@ -173,7 +174,7 @@ func SendEtherFromCoinbaseToUser(amount string, to eth.Address) error {
 }
 
 func SendGbpFromMonzoToCoinbase() error {
-	return DepositToMonzoPot(MonzoPotIdCoinbase, EtherValueGBP*100)
+	return DepositToMonzoPot(os.Getenv("MonzoPotIdCoinbase"), EtherValueGBP*100)
 }
 
 func ProcessOrder(w http.ResponseWriter, r *http.Request) error {
@@ -215,7 +216,7 @@ func ProcessOrder(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	err = DepositToMonzoPot(MonzoPotIdProfit, ServiceChargeGBP*100)
+	err = DepositToMonzoPot(os.Getenv("MonzoPotIdProfit"), ServiceChargeGBP*100)
 
 	return err
 }
