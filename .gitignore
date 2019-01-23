@@ -2,3 +2,4 @@ secrets.go
 test-monzo-webhook.sh
 etherdirect
 server
+constants

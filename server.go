@@ -77,7 +77,7 @@ func main() {
 
 	httpsMux.HandleFunc("/favicon.ico", faviconHandler)
 	httpsMux.HandleFunc("/", indexHandler)
-	httpsMux.HandleFunc("/monzo-"+WebHookSecretUrlPart, HandleMonzoTransactionWebHook)
+	httpsMux.HandleFunc("/monzo-"+WebHookSecretUrlPart, monzoWebhookHandler)
 	httpsMux.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir(FileSystemRoot+"js"))))
 	httpsMux.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir(FileSystemRoot+"css"))))
 
