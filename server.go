@@ -84,11 +84,11 @@ func main() {
 	httpsMux.HandleFunc("/monzo-"+os.Getenv("WebHookSecretUrlPart"), monzoWebhookHandler)
 	httpsMux.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir(FileSystemRoot+"js"))))
 	httpsMux.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir(FileSystemRoot+"css"))))
+	httpsMux.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir(FileSystemRoot+"img"))))
 
 	httpMux := http.NewServeMux()
 
 	httpMux.Handle("/.well-known/acme-challenge/", http.StripPrefix("/.well-known/acme-challenge/", http.FileServer(http.Dir(FileSystemRoot+".well-known/acme-challenge"))))
-	httpMux.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir(FileSystemRoot+"img"))))
 	httpMux.HandleFunc("/", redirectToHttpsHandler)
 
 	go http.ListenAndServe(":"+strconv.Itoa(PortHttp), logAndDelegate(httpMux))
