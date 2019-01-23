@@ -10,7 +10,6 @@ import (
 
 	coinbase "github.com/preichenberger/go-gdax"
 	monzo "github.com/tjvr/go-monzo"
-	"google.golang.org/appengine"
 )
 
 var templates = make(map[string]*template.Template)
@@ -94,6 +93,4 @@ func main() {
 
 	go http.ListenAndServe(":"+strconv.Itoa(PortHttp), logAndDelegate(httpMux))
 	log.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(PortHttps), HttpsCertificate, HttpsPrivateKey, logAndDelegate(httpsMux)))
-
-	appengine.Main()
 }
