@@ -194,6 +194,11 @@ func ProcessOrder(w http.ResponseWriter, r *http.Request) error {
 		return Refund(order, err)
 	}
 
+	// Ignore outgoing transaction
+	if order.Amount < 0 {
+		return nil
+	}
+
 	// Try to buy ether
 	err, amount := BuyEtherOnCoinbase()
 	if err != nil {

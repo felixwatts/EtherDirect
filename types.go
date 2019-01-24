@@ -13,7 +13,7 @@ type Order struct {
 	SortCode      string
 	AccountNumber string
 	Currency      string
-	Amount        uint
+	Amount        int
 	EthAddress    eth.Address
 }
 
