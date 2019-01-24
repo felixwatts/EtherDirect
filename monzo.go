@@ -77,7 +77,7 @@ func monzoLoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	go refreshMonzoAccessToken()
 
-	fmt.Fprint(w, "Successfully logged into Monzo")
+	http.Redirect(w, r, "https://etherdirect.co.uk", http.StatusMovedPermanently)
 }
 
 func refreshMonzoAccessToken() {
