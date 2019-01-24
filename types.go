@@ -9,24 +9,6 @@ import (
 type IndexViewModel struct {
 }
 
-type MonzoWebHookCounterParty struct {
-	Name          string
-	SortCode      string `json:"sort_code"`
-	AccountNumber string `json:"account_number"`
-}
-
-type MonzoWebHookTransaction struct {
-	Description  string
-	Amount       uint
-	Currency     string
-	CounterParty MonzoWebHookCounterParty
-}
-
-type MonzoWebHook struct {
-	Type string
-	Data MonzoWebHookTransaction
-}
-
 type Order struct {
 	SortCode      string
 	AccountNumber string

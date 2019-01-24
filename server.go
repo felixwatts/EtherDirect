@@ -9,7 +9,6 @@ import (
 	"time"
 
 	coinbase "github.com/preichenberger/go-gdax"
-	monzo "github.com/tjvr/go-monzo"
 )
 
 var templates = make(map[string]*template.Template)
@@ -17,10 +16,7 @@ var coinbaseClient = coinbase.NewClient(
 	os.Getenv("CoinbaseSecret"),
 	os.Getenv("CoinbaseKey"),
 	os.Getenv("CoinbasePassphrase"))
-var monzoClient = monzo.Client{
-	BaseURL:     "https://api.monzo.com",
-	AccessToken: os.Getenv("MonzoAccessToken"),
-}
+
 var nextDedupeId int64 = 0
 
 func logAndDelegate(handler http.Handler) http.Handler {
@@ -82,6 +78,8 @@ func main() {
 	httpsMux.HandleFunc("/favicon.ico", faviconHandler)
 	httpsMux.HandleFunc("/", indexHandler)
 	httpsMux.HandleFunc("/monzo-"+os.Getenv("WebHookSecretUrlPart"), monzoWebhookHandler)
+	httpsMux.HandleFunc("/monzo-login", monzoLoginHandler)
+	httpsMux.HandleFunc("/monzo-oath-callback", monzoLoginCallbackHandler)
 	httpsMux.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir(FileSystemRoot+"js"))))
 	httpsMux.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir(FileSystemRoot+"css"))))
 	httpsMux.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir(FileSystemRoot+"img"))))
