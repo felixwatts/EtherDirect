@@ -74,6 +74,9 @@ func IsValidAddress(v string) bool {
 }
 
 func ParseOrder(r *http.Request) (err error, tx Order) {
+
+	log.Println(r.Body)
+
 	var data = MonzoWebHook{}
 
 	decoder := json.NewDecoder(r.Body)
