@@ -73,13 +73,41 @@ func monzoLoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	v.Set("redirect_uri", "https://etherdirect.co.uk/monzo-oath-callback")
 	v.Set("code", code)
 
-	rsp, err := http.PostForm("https://api.monzo.com/oauth2/token", v)
+	getMonzoAccessToken(v)
+
+	go refreshMonzoAccessToken()
+
+	fmt.Fprint(w, "Successfully logged into Monzo")
+}
+
+func refreshMonzoAccessToken() {
+	for {
+		log.Println("Refreshing Monzo access token...")
+
+		time.Sleep(1 * time.Hour)
+
+		v := url.Values{}
+		v.Set("grant_type", "refresh_token")
+		v.Set("client_id", os.Getenv("MonzoClientId"))
+		v.Set("client_secret", os.Getenv("MonzoClientSecret"))
+		v.Set("refresh_token", monzoClient.RefreshToken)
+
+		getMonzoAccessToken(v)
+	}
+}
+
+func getMonzoAccessToken(params url.Values) {
+	rsp, err := http.PostForm("https://api.monzo.com/oauth2/token", params)
+
+	if err != nil {
+		panic(err.Error())
+	}
 
 	data := MonzoAccessTokenGrant{}
 	decoder := json.NewDecoder(rsp.Body)
 	err = decoder.Decode(&data)
 	if err != nil {
-		panic("Failed to parse oath response body: " + err.Error())
+		panic(err.Error())
 	}
 
 	monzoClient = monzo.Client{
@@ -89,34 +117,5 @@ func monzoLoginCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		UserID:       os.Getenv("MonzoUserId"),
 	}
 
-	go refreshMonzoAccessToken()
-
-}
-
-func refreshMonzoAccessToken() {
-	for {
-		time.Sleep(1 * time.Hour)
-
-		v := url.Values{}
-		v.Set("grant_type", "refresh_token")
-		v.Set("client_id", os.Getenv("MonzoClientId"))
-		v.Set("client_secret", os.Getenv("MonzoClientSecret"))
-		v.Set("refresh_token", monzoClient.RefreshToken)
-
-		rsp, err := http.PostForm("https://api.monzo.com/oauth2/token", v)
-
-		data := MonzoAccessTokenGrant{}
-		decoder := json.NewDecoder(rsp.Body)
-		err = decoder.Decode(&data)
-		if err != nil {
-			panic("Failed to parse oath response body: " + err.Error())
-		}
-
-		monzoClient = monzo.Client{
-			AccessToken:  data.AccessToken,
-			RefreshToken: data.RefreshToken,
-			BaseURL:      "https://api.monzo.com/",
-			UserID:       os.Getenv("MonzoUserId"),
-		}
-	}
+	log.Printf("Successfully logged into Monzo. Access token: %s Refresh Token: %s", monzoClient.AccessToken, monzoClient.RefreshToken)
 }
