@@ -49,7 +49,7 @@ func HandleError(err error) {
 	}
 }
 
-func DepositToMonzoPot(potId string, amountPence uint) error {
+func DepositToMonzoPot(potId string, amountPence int) error {
 
 	ddid := nextDedupeId
 	nextDedupeId = nextDedupeId + 1
