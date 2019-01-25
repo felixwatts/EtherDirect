@@ -94,6 +94,10 @@ func ParseOrder(r *http.Request) (err error, tx Order) {
 	tx.Amount = data.Data.Amount
 	tx.Currency = data.Data.Currency
 
+	if tx.Amount <= 0 {
+		return
+	}
+
 	if tx.SortCode == "" || tx.AccountNumber == "" {
 		return errors.New("Counterparty data missing"), tx
 	}
@@ -198,7 +202,7 @@ func ProcessOrder(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Ignore outgoing transaction
-	if order.Amount < 0 {
+	if order.Amount <= 0 {
 		return nil
 	}
 
