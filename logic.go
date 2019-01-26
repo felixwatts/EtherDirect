@@ -74,12 +74,15 @@ func IsValidAddress(v string) bool {
 	return re.MatchString(v)
 }
 
+func AccessCodeToEthereumAddress(accessCode string) (string, error) {
+	dat, err := ioutil.ReadFile(fmt.Sprintf("%saccess-codes/%s.txt", FileSystemRoot, accessCode))
+	if err != nil {
+		return "", err
+	}
+	return string(dat), nil
+}
+
 func ParseOrder(r *http.Request) (err error, tx Order) {
-
-	body, err := ioutil.ReadAll(r.Body)
-	bodyString := string(body)
-	log.Println(bodyString)
-
 	var data = MonzoWebHook{}
 
 	decoder := json.NewDecoder(r.Body)
@@ -87,6 +90,8 @@ func ParseOrder(r *http.Request) (err error, tx Order) {
 	if err != nil {
 		return errors.New("Failed to parse request body: " + err.Error()), tx
 	}
+
+	log.Println(data)
 
 	if data.Type != "transaction.created" {
 		return errors.New("Unexpected WebHook type: " + data.Type), tx
@@ -113,11 +118,12 @@ func ParseOrder(r *http.Request) (err error, tx Order) {
 		return errors.New("Wrong currency. Send GBP only"), tx
 	}
 
-	if !IsValidAddress(data.Data.Description) {
-		return errors.New("Reference field of transfer must contain a valid Ethereum address"), tx
+	ethereumAddress, err := AccessCodeToEthereumAddress(data.Data.Description)
+	if err != nil {
+		return errors.New("Unknown access code"), tx
 	}
 
-	tx.EthAddress = eth.HexToAddress(data.Data.Description)
+	tx.EthAddress = eth.HexToAddress(ethereumAddress)
 
 	return nil, tx
 }
