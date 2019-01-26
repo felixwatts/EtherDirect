@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -75,7 +76,9 @@ func IsValidAddress(v string) bool {
 
 func ParseOrder(r *http.Request) (err error, tx Order) {
 
-	log.Println(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
+	bodyString := string(body)
+	log.Println(bodyString)
 
 	var data = MonzoWebHook{}
 

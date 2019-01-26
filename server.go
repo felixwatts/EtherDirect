@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -18,6 +21,7 @@ var coinbaseClient = coinbase.NewClient(
 	os.Getenv("CoinbasePassphrase"))
 
 var nextDedupeId int64 = 0
+var nextAccessCode uint = 0
 
 func logAndDelegate(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +61,49 @@ func monzoWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	HandleError(ProcessOrder(w, r))
 }
 
+type GetAccessCodeResponse struct {
+	Error      string `json:"error"`
+	AccessCode string `json:"access_code"`
+}
+
+func getAccessCodeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.NotFound(w, r)
+		return
+	}
+
+	address := r.FormValue("ethereum-address")
+
+	response := GetAccessCodeResponse{}
+
+	if IsValidAddress(address) {
+
+		accessCode := nextAccessCode
+		nextAccessCode = nextAccessCode + 1
+
+		filename := fmt.Sprintf("%saccess-codes/%d.txt", FileSystemRoot, accessCode)
+
+		err := ioutil.WriteFile(filename, []byte(address), 0644)
+
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+	} else {
+		response.Error = "Invalid ethereum address"
+	}
+
+	json, err := json.Marshal(response)
+
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(json)
+}
+
 func init() {
 	for _, tmpl := range []string{"index"} {
 		filename := FileSystemRoot + "html/" + tmpl + ".html"
@@ -77,6 +124,7 @@ func main() {
 
 	httpsMux.HandleFunc("/favicon.ico", faviconHandler)
 	httpsMux.HandleFunc("/", indexHandler)
+	httpsMux.HandleFunc("/get-access-code", getAccessCodeHandler)
 	httpsMux.HandleFunc("/monzo-"+os.Getenv("WebHookSecretUrlPart"), monzoWebhookHandler)
 	httpsMux.HandleFunc("/monzo-login", monzoLoginHandler)
 	httpsMux.HandleFunc("/monzo-oath-callback", monzoLoginCallbackHandler)
