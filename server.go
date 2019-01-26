@@ -74,21 +74,25 @@ func getAccessCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	address := r.FormValue("ethereum-address")
 
+	log.Println(address)
+
 	response := GetAccessCodeResponse{}
 
 	if IsValidAddress(address) {
 
-		accessCode := nextAccessCode
-		nextAccessCode = nextAccessCode + 1
+		accessCode := time.Now().Unix()
 
 		filename := fmt.Sprintf("%saccess-codes/%d.txt", FileSystemRoot, accessCode)
 
 		err := ioutil.WriteFile(filename, []byte(address), 0644)
 
 		if err != nil {
+			log.Println(err.Error())
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
+
+		response.AccessCode = fmt.Sprintf("%d6", accessCode)
 
 	} else {
 		response.Error = "Invalid ethereum address"
@@ -97,6 +101,7 @@ func getAccessCodeHandler(w http.ResponseWriter, r *http.Request) {
 	json, err := json.Marshal(response)
 
 	if err != nil {
+		log.Println(err.Error())
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}

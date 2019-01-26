@@ -141,12 +141,13 @@ form.addEventListener("submit", function(e) {
 
   x.onreadystatechange = function() {
     if(x.readyState == 4) {
-      console.log(x.response)
-      if (x.response.error !== undefined) {
 
-      } else {
-        document.getElementById("access-code").innerText = x.response.access_code;
-      }
+	const data = JSON.parse(x.response);
+	if(data.error === '') {
+	      document.getElementById("access-code").innerText = data.access_code;
+	} else {
+	      document.getElementById("access-code").innerText = data.error;
+	}
     }
   }
 
