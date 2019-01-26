@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link href="https://fonts.googleapis.com/css?family=Sarabun" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
         <title>EtherDirect</title>
     </head>
     <body>
@@ -12,11 +13,7 @@
             <div class="w3-col" style="width:284px">
                 <img src="../img/logo_black.png" />
             </div>
-            <div class="w3-rest w3-display-container" style="height:142px">
-                <div class="w3-display-middle">
-                        <p style="font-family: 'Sarabun', sans-serif;font-size: 36pt;margin:0">top up the easy way</p>
-                </div>
-            </div>
+            <p style="font-family: 'Sarabun', sans-serif;font-size: 36pt;margin:0">top up the easy way</p>
         </div>
 
 
@@ -42,23 +39,111 @@
         </div>
 
         <div class="w3-row-padding">
-            <div class="w3-third">
+            <div class="w3-quarter">
                 <h2>❶ Get an Ethereum account</h2>
                 <p>If you don't have one yet don't worry, it's free.</p>
                 <p>We recommend <a href="https://metamask.io/">Metamask</a> or <a href="https://mycrypto.com">MyCrypto</a></p>
             </div>
                 
-            <div class="w3-third">
-                <h2>❷ Make a payment</h2>
-                <p>When you're ready, arrange a bank transfer to our account.</p>
-                <p>The amount must be between £5 and £20.</p> 
-                <p>In the <mono>Reference</mono>/Message field put the address of your Ethereum account</p> 
+            <div class="w3-quarter">
+                <h2>❷ Get your access code</h2>
+                <p>Use the form below to get your access code instantly</p>
+                <p>The access code tells us which Ethereum account to send Ether to when we receive your payment</p> 
             </div>
                 
+            <div class="w3-quarter">
+                <h2>❸ Arrange payment</h2>
+                <p>Arrange a bank transfer to our account</p>
+                <p>The amount should be between £1 and £50</p>
+                <p>Quote your access code in the Reference/Description/Message field of the transfer</p>
+            </div>
+
+            <div class="w3-quarter">
+                <h2>❹ Receive your Ether</h2>
+                <p>Once we receive your payment we will purchase the requisite value Ether and transfer it directly to your Ethereum account</p>
+                <p>The Ether will usually arrive in your account within a few minutes</p>
+            </div>
+        </div>
+
+        <div class="w3-panel w3-row-padding w3-yellow">
+            <h2>OK, I'm ready to buy Ether!</h2>
+        </div>
+
+        <div class="w3-panel w3-row-padding">
             <div class="w3-third">
-                <h2>❸ Receive your Ether</h2>
-                <p>Once we receive your payment, we take a fixed £1 service charge and use the rest of the money to source Ether at a competitive price</p>
-                <p>We transfer the Ether directly to your Ethereum account. It should arrive within minutes</p>
+                <div class="w3-card w3-blue w3-row-padding">
+                    <h3>❶ Get access code</h3>
+                    <p>Enter your Ethereum address to get an access code</p>
+                    <form action="/get-access-code" style="margin-bottom: 0.5cm">
+                        <div class="w3-row-padding">
+                            <input 
+                                type="text" 
+                                name="ethereum-address" 
+                                maxlength="42" 
+                                minlength="42" 
+                                placeholder="Your Ethereum address e.g. 0xDaEF995931D6F00F56226b29ba70353327b21E00"
+                                style="width:100%" />
+                        </div>
+                        <div class="w3-row-padding">
+                            <input type="submit" style="width:100%;margin-top: 0.5cm" />
+                        </div>                                     
+                    </form>
+                    <h3>Your access code</h3>
+                    <div class="w3-jumbo" id="access-code"></div>
+                </div>
+            </div>
+            <div class="w3-twothird">
+                <div class="w3-panel w3-leftbar w3-pale-yellow w3-border-yellow">
+                    <p>⚠️ Take extra care when entering your Ethereum address. If you enter a valid but wrong address, your Ether will be lost and we will not be able to refund you</p>
+                </div> 
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
+                    <p>🛈 Your access code is permanent, you can reuse it as many times as you like</p>
+                </div> 
+            </div>
+        </div>
+
+        <div class="w3-panel w3-row-padding">
+            <div class="w3-third">
+                <div class="w3-card w3-blue w3-row-padding">
+                    <h3>❷ Arrange payment</h3>
+                    <p>Once you have an access code you can arrange payment via bank transfer</p>
+                    <p>As soon as we receive your payment we will process your order and transfer your Ether to your Ethereum account</p>
+                    <div class="w3-panel w3-large">
+                        <table style="font-family: 'Roboto Mono', monospace;">
+                            <tr>
+                                <td>Name</td>
+                                <td>EtherDirect</td>
+                            </tr>
+                            <tr>
+                                <td>Sort code</td>
+                                <td>XX-XX-XX <span onclick="copyStringToClipboard('XXXXXX')">📋</span></td>
+                            </tr>
+                            <tr>
+                                <td>Account number</td>
+                                <td>XXXXXXXX <span onclick="copyStringToClipboard('XXXXXXXX')">📋</span></td>
+                            </tr>
+                            <tr>
+                                <td>Reference</td>
+                                <td id="access-code-2">&lt;your access code&gt;</td>
+                            </tr>
+                            <tr>
+                                <td>Amount</td>
+                                <td>£1 - £50</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="w3-twothird">
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
+                    <p>🛈 If you send too much or too little money we will refund you</p>
+                </div> 
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
+                    <p>🛈 If you forget to include your access code or include an invalid access code we will refund you</p>
+                </div> 
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
+                    <p>🛈 Refunds are usually handled within 48 hours</p>
+                </div> 
             </div>
         </div>
 
@@ -72,12 +157,14 @@
             <div class="w3-row-padding">
                 <p>The price of Ether is changing all the time, so the exact amount is determined at the time you place your order</p>
 
+                <p>We subtract a 15% commission from your order value and use the remainder to source Ether at a competitive price</p>
+
+                <div class="w3-panel w3-leftbar w3-pale-yellow w3-border-yellow">
+                    <p>⚠️ We charge a 15% commission on each order</p>
+                </div> 
+
                 <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
                     <p>🛈 Our Ether is priced at the Coinbase ETH/GBP best offer price</p>
-                </div> 
-    
-                <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
-                    <p>🛈 We charge a fixed £1 service charge per order</p>
                 </div> 
                 
                 <p>Here are some illustrative figures based on today's Ether price</p>
@@ -106,30 +193,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="w3-panel w3-row-padding w3-yellow">
-            <h2>OK, I'm ready to buy Ether!</h2>
-        </div>
-
-        <div class="w3-row-padding">
-            <div class="w3-third">
-                <div class="w3-card w3-blue w3-row-padding">
-                    <h3>Get access code</h3>
-                    <form action="/get-access-code">
-                        <p>Enter you Ethereum address to get a permanent access code</p>
-                        <input type="text" name="ethereum-address" style="width:360px" maxlength="42" minlength="42" placeholder="Your Ethereum address e.g. 0xDaEF995931D6F00F56226b29ba70353327b21E00" />
-                        <input type="submit" />
-                    </form>
-                    <div></div>
-                </div>
-            </div>
-            <div class="w3-twothird">
-                <div class="w3-card w3-blue w3-row-padding">
-                    <h3>Your access code</h3>
-                    <div class="w3-jumbo" id="access-code"></div>
-                </div>
-            </div>
-        </div>
     </body>
     <script>
 var form = document.querySelector("form")
@@ -145,6 +208,7 @@ form.addEventListener("submit", function(e) {
 	const data = JSON.parse(x.response);
 	if(data.error === '') {
 	      document.getElementById("access-code").innerText = data.access_code;
+          document.getElementById("access-code-2").innerText = data.access_code;
 	} else {
 	      document.getElementById("access-code").innerText = data.error;
 	}
@@ -153,6 +217,23 @@ form.addEventListener("submit", function(e) {
 
   x.open("POST", "/get-access-code")
   x.send(new FormData(form))
-})
+});
+
+function copyStringToClipboard (str) {
+   // Create new element
+   var el = document.createElement('textarea');
+   // Set value (string to be copied)
+   el.value = str;
+   // Set non-editable to avoid focus and move outside of view
+   el.setAttribute('readonly', '');
+   el.style = {position: 'absolute', left: '-9999px'};
+   document.body.appendChild(el);
+   // Select text inside element
+   el.select();
+   // Copy text to clipboard
+   document.execCommand('copy');
+   // Remove temporary element
+   document.body.removeChild(el);
+}
     </script>
 </html>
