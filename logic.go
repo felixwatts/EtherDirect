@@ -7,34 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
-	"strconv"
 
 	eth "github.com/ethereum/go-ethereum/common"
-	coinbase "github.com/preichenberger/go-gdax"
-	monzo "github.com/tjvr/go-monzo"
 )
-
-func PostMonzoFeedError(err error) error {
-	return monzoClient.CreateFeedItem(&monzo.FeedItem{
-		AccountID: os.Getenv("MonzoAccountId"),
-		Title:     "ERROR",
-		Body:      err.Error(),
-		Type:      "basic",
-		ImageURL:  "https://cdn0.iconfinder.com/data/icons/elasto-online-store/26/00-ELASTOFONT-STORE-READY_close-512.png",
-	})
-}
-
-func PostMonzoFeedInfo(heading string, msg string) error {
-	return monzoClient.CreateFeedItem(&monzo.FeedItem{
-		AccountID: os.Getenv("MonzoAccountId"),
-		Title:     heading,
-		Body:      msg,
-		Type:      "basic",
-		ImageURL:  "https://cdn0.iconfinder.com/data/icons/elasto-online-store/26/00-STORE-37-512.png",
-	})
-}
 
 func HandleError(err error) {
 	if err == nil {
@@ -43,30 +19,11 @@ func HandleError(err error) {
 
 	log.Println(err.Error())
 
-	err = PostMonzoFeedError(err)
+	err = monzoClient.PostError(err)
 
 	if err != nil {
 		log.Println("Failed to post to Monzo feed: " + err.Error())
 	}
-}
-
-func DepositToMonzoPot(potId string, amountPence int) error {
-
-	ddid := nextDedupeId
-	nextDedupeId = nextDedupeId + 1
-
-	_, err := monzoClient.Deposit(&monzo.DepositRequest{
-		PotID:          potId,
-		AccountID:      os.Getenv("MonzoAccountId"),
-		Amount:         int64(amountPence),
-		IdempotencyKey: strconv.FormatInt(ddid, 10),
-	})
-
-	if err != nil {
-		return errors.New("Failed to deposit to Monzo pot " + potId + ": " + err.Error())
-	}
-
-	return nil
 }
 
 func IsValidAddress(v string) bool {
@@ -110,8 +67,8 @@ func ParseOrder(r *http.Request) (err error, tx Order) {
 		return errors.New("Counterparty data missing"), tx
 	}
 
-	if data.Data.Amount != OrderAmountPence {
-		return errors.New(fmt.Sprintf("Wrong amount. Send £%.2f exactly", OrderAmountPence/100.0)), tx
+	if tx.Amount < 100 || tx.Amount > 5000 {
+		return errors.New(fmt.Sprintf("Invalid amount. Send £1 - £50", OrderAmountPence/100.0)), tx
 	}
 
 	if data.Data.Currency != "GBP" {
@@ -134,63 +91,15 @@ func Refund(tx Order, err error) error {
 		return errors.New("An error occurred but we do not have enough information to issue a refund: " + err.Error())
 	}
 
-	PostMonzoFeedInfo("REFUND", fmt.Sprintf("%s %s %d %s %s", tx.SortCode, tx.AccountNumber, tx.Amount, tx.Currency, err.Error()))
+	monzoClient.PostInfo("REFUND", fmt.Sprintf("%s %s %d %s %s", tx.SortCode, tx.AccountNumber, tx.Amount, tx.Currency, err.Error()))
 
-	err2 := DepositToMonzoPot(os.Getenv("MonzoPotIdRefund"), tx.Amount)
+	err2 := monzoClient.MoveToPot("refund", tx.Amount)
 
 	if err2 != nil {
 		return errors.New("Failed to deposit into Refund pot: " + err2.Error() + ". Original error: " + err.Error())
 	}
 
 	return err
-}
-
-func BuyEtherOnCoinbase() (err error, filledSize string) {
-	log.Printf("Buy £%d worth of ETH on coinbase", EtherValueGBP)
-
-	order := coinbase.Order{
-		Type:      "market",
-		Side:      "buy",
-		ProductId: "ETH-EUR",
-		Funds:     fmt.Sprintf("%d.00", EtherValueGBP),
-	}
-
-	result, err := coinbaseClient.CreateOrder(&order)
-	if err != nil {
-		return errors.New("Failed to buy Ether on Coinbase: " + err.Error()), "0"
-	}
-
-	executedOrder, err := coinbaseClient.GetOrder(result.Id)
-
-	return nil, executedOrder.FilledSize
-}
-
-func SendEtherFromCoinbaseToUser(amount string, to eth.Address) error {
-
-	log.Printf("Send %s ETH from Coinbase to %s", amount, to.Hex())
-
-	var params = CoinbaseWithdrawCryptoParams{
-		Amount:        amount,
-		Currency:      "ETH",
-		CryptoAddress: to.Hex(),
-	}
-	var result = CoinbaseWithdrawCryptoResult{}
-
-	_, err := coinbaseClient.Request(
-		"POST",
-		"/withdrawals/crypto",
-		params,
-		&result)
-
-	if err != nil {
-		return errors.New("Failed to transfer ETH from Coinbase to user: " + err.Error())
-	}
-
-	return nil
-}
-
-func SendGbpFromMonzoToCoinbase() error {
-	return DepositToMonzoPot(os.Getenv("MonzoPotIdCoinbase"), EtherValueGBP*100)
 }
 
 func ProcessOrder(w http.ResponseWriter, r *http.Request) error {
@@ -215,29 +124,31 @@ func ProcessOrder(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	// Try to buy ether
-	err, amount := BuyEtherOnCoinbase()
-	if err != nil {
-		// If buying ether fails, refund the user
-		return Refund(order, err)
-	}
+	return logic.Fulfill(order)
 
-	// Try to send Ether to user
-	err = SendEtherFromCoinbaseToUser(amount, order.EthAddress)
-	if err != nil {
-		// If sending ether to user fails, refund
-		return Refund(order, err)
-		// TODO try to sell the ether on coinbase?
-	}
+	// // Try to buy ether
+	// err, amount := coinbaseClient.BuyEther()
+	// if err != nil {
+	// 	// If buying ether fails, refund the user
+	// 	return Refund(order, err)
+	// }
 
-	// Interaction with user is complete, now try to balance our internal books
+	// // Try to send Ether to user
+	// err = coinbaseClient.SendEther(amount, order.EthAddress)
+	// if err != nil {
+	// 	// If sending ether to user fails, refund
+	// 	return Refund(order, err)
+	// 	// TODO try to sell the ether on coinbase?
+	// }
 
-	err = SendGbpFromMonzoToCoinbase()
-	if err != nil {
-		return err
-	}
+	// // Interaction with user is complete, now try to balance our internal books
 
-	err = DepositToMonzoPot(os.Getenv("MonzoPotIdProfit"), ServiceChargeGBP*100)
+	// err = monzoClient.MoveToPot("coinbase", EtherValueGBP*100)
+	// if err != nil {
+	// 	return err
+	// }
 
-	return err
+	// err = monzoClient.MoveToPot("profit", ServiceChargeGBP*100)
+
+	// return err
 }
