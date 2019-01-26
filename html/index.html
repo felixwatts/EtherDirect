@@ -55,12 +55,12 @@
                 <h2>❸ Arrange payment</h2>
                 <p>Arrange a bank transfer to our account</p>
                 <p>The amount should be between £1 and £50</p>
-                <p>Quote your access code in the Reference/Description/Message field of the transfer</p>
+                <p>Quote your access code in the Reference/Description/Message field of the transfer so we know where to send the Ether</p>
             </div>
 
             <div class="w3-quarter">
                 <h2>❹ Receive your Ether</h2>
-                <p>Once we receive your payment we will purchase the requisite value Ether and transfer it directly to your Ethereum account</p>
+                <p>Once we receive your payment we will purchase the requisite value in Ether and transfer it directly to your Ethereum account</p>
                 <p>The Ether will usually arrive in your account within a few minutes</p>
             </div>
         </div>
@@ -124,7 +124,7 @@
                             </tr>
                             <tr>
                                 <td>Reference</td>
-                                <td id="access-code-2">&lt;your access code&gt;</td>
+                                <td id="access-code-2"><span id="access-code-2">&lt;your access code&gt;</span><span id="access-code-2-copy">📋</span></td>
                             </tr>
                             <tr>
                                 <td>Amount</td>
@@ -136,7 +136,7 @@
             </div>
             <div class="w3-twothird">
                 <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
-                    <p>🛈 If you send too much or too little money we will refund you</p>
+                    <p>🛈 If you send more than £50 or less than £1 we will refund you</p>
                 </div> 
                 <div class="w3-panel w3-leftbar w3-pale-blue w3-border-blue">
                     <p>🛈 If you forget to include your access code or include an invalid access code we will refund you</p>
@@ -209,6 +209,7 @@ form.addEventListener("submit", function(e) {
 	if(data.error === '') {
 	      document.getElementById("access-code").innerText = data.access_code;
           document.getElementById("access-code-2").innerText = data.access_code;
+          document.getElementById("access-code-2-copy").onclick = () => copyStringToClipboard(data.access_code)
 	} else {
 	      document.getElementById("access-code").innerText = data.error;
 	}
