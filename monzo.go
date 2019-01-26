@@ -63,11 +63,12 @@ func (m *Monzo) HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 func (m *Monzo) HandleOauth2Callback(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
-	state := params["state"][0]
-	if state != m.oath2StateToken {
-		log.Println("Invalid state in monzo oauth callback")
-		return
-	}
+	// TODO
+	// state := params["state"][0]
+	// if state != m.oath2StateToken {
+	// 	log.Println("Invalid state in monzo oauth callback")
+	// 	return
+	// }
 
 	code := params["code"][0]
 
