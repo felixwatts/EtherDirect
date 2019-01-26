@@ -74,8 +74,6 @@ func getAccessCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	address := r.FormValue("ethereum-address")
 
-	log.Println(address)
-
 	response := GetAccessCodeResponse{}
 
 	if IsValidAddress(address) {
@@ -94,7 +92,10 @@ func getAccessCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 		response.AccessCode = fmt.Sprintf("%d", accessCode)
 
+		log.Printf("Issued access code %d for address %s", accessCode, address)
+
 	} else {
+		log.Println("Cannot issue access code: Invalid ethereum address")
 		response.Error = "Invalid ethereum address"
 	}
 
