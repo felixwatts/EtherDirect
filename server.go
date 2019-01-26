@@ -92,7 +92,7 @@ func getAccessCodeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		response.AccessCode = fmt.Sprintf("%d6", accessCode)
+		response.AccessCode = fmt.Sprintf("%d", accessCode)
 
 	} else {
 		response.Error = "Invalid ethereum address"
