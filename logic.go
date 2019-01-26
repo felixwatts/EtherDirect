@@ -68,7 +68,7 @@ func ParseOrder(r *http.Request) (err error, tx Order) {
 	}
 
 	if tx.Amount < 100 || tx.Amount > 5000 {
-		return errors.New(fmt.Sprintf("Invalid amount. Send £1 - £50", OrderAmountPence/100.0)), tx
+		return errors.New("Invalid amount. Send £1 - £50"), tx
 	}
 
 	if data.Data.Currency != "GBP" {
