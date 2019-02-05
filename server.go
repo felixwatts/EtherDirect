@@ -17,6 +17,10 @@ var monzoClient = Monzo{
 	nextDedupeId: time.Now().Unix(),
 }
 var coinbaseClient = Coinbase{}
+var logic = Logic{
+	coinbase: &coinbaseClient,
+	monzo:    &monzoClient,
+}
 
 var nextAccessCode uint = 0
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -9,6 +10,12 @@ import (
 	eth "github.com/ethereum/go-ethereum/common"
 	coinbase "github.com/preichenberger/go-gdax"
 )
+
+type ICoinbase interface {
+	BuyEther() (err error, filledSize float64)
+	SendEther(amount string, to eth.Address) error
+	GetEtherPrice() (float64, error)
+}
 
 type Coinbase struct {
 	client *coinbase.Client
@@ -24,28 +31,28 @@ func (c *Coinbase) Init() {
 func (c *Coinbase) BuyEther() (err error, filledSize float64) {
 	log.Printf("Buy £%d worth of ETH on coinbase", EtherValueGBP)
 
-	return nil, 0.1
+	// return nil, 0.1
 
-	// order := coinbase.Order{
-	// 	Type:      "market",
-	// 	Side:      "buy",
-	// 	ProductId: "ETH-EUR",
-	// 	Funds:     fmt.Sprintf("%d.00", EtherValueGBP),
-	// }
+	order := coinbase.Order{
+		Type:      "market",
+		Side:      "buy",
+		ProductId: "ETH-GBP",
+		Funds:     fmt.Sprintf("%d.00", EtherValueGBP),
+	}
 
-	// result, err := c.client.CreateOrder(&order)
-	// if err != nil {
-	// 	return errors.New("Failed to buy Ether on Coinbase: " + err.Error()), 0
-	// }
+	result, err := c.client.CreateOrder(&order)
+	if err != nil {
+		return errors.New("Failed to buy Ether on Coinbase: " + err.Error()), 0
+	}
 
-	// executedOrder, err := c.client.GetOrder(result.Id)
+	executedOrder, err := c.client.GetOrder(result.Id)
 
-	// f, err := strconv.ParseFloat(executedOrder.FilledSize, 64)
-	// if err != nil {
-	// 	return err, 0
-	// }
+	f, err := strconv.ParseFloat(executedOrder.FilledSize, 64)
+	if err != nil {
+		return err, 0
+	}
 
-	// return nil, f
+	return nil, f
 }
 
 func (c *Coinbase) SendEther(amount string, to eth.Address) error {

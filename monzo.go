@@ -15,6 +15,10 @@ import (
 	monzo "github.com/tjvr/go-monzo"
 )
 
+type IMonzo interface {
+	MoveToPot(potName string, amountPence int) error
+}
+
 type MonzoWebHookCounterParty struct {
 	Name          string
 	SortCode      string `json:"sort_code"`
@@ -22,6 +26,7 @@ type MonzoWebHookCounterParty struct {
 }
 
 type MonzoWebHookTransaction struct {
+	AccountId    string `json:"account_id"`
 	Description  string
 	Amount       int
 	Currency     string
